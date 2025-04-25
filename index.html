@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <title>Red-Green Pattern Tracker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: darkgreen;
+    }
+  </style>
+</head>
+<body>
+  <h2>Red Green Pattern Tracker</h2>
+
+  <label>ऐतिहासिक डेटा दर्ज करें (उदाहरण: 0-5, 1-8, ...):</label>
+  <textarea id="historicalData" rows="8" placeholder="0-5, 1-8, 2-9, ..."></textarea>
+
+  <label>वर्तमान के तीन परिणाम दर्ज करें (उदाहरण: 2 4 7):</label>
+  <input type="text" id="currentResults" placeholder="उदाहरण: 2 4 7">
+
+  <button onclick="predict()">भविष्यवाणी करें</button>
+
+  <div id="result"></div>
+
+  <script>
+    function numberToColor(num) {
+      if ([2, 4, 6, 8].includes(num)) return 'Red';
+      if ([1, 3, 7, 9].includes(num)) return 'Green';
+      if ([0, 5].includes(num)) return 'Violet';
+      return '';
+    }
+
+    function predict() {
+      const dataText = document.getElementById("historicalData").value.trim();
+      const inputPattern = document.getElementById("currentResults").value.trim();
+
+      if (!dataText || !inputPattern) {
+        alert("कृपया सभी इनपुट भरें।");
+        return;
+      }
+
+      const currentNums = inputPattern.split(' ').map(n => parseInt(n));
+      if (currentNums.length !== 3 || currentNums.some(isNaN)) {
+        alert("कृपया तीन वैध नंबर space से दर्ज करें (उदाहरण: 2 4 7)");
+        return;
+      }
+
+      const dataArray = dataText.split(',').map(entry => {
+        const parts = entry.trim().split('-');
+        return parts.length === 2 ? parseInt(parts[1]) : null;
+      }).filter(val => val !== null);
+
+      let foundPrediction = null;
+
+      for (let i = 0; i <= dataArray.length - 4; i++) {
+        if (
+          dataArray[i] === currentNums[0] &&
+          dataArray[i + 1] === currentNums[1] &&
+          dataArray[i + 2] === currentNums[2]
+        ) {
+          foundPrediction = dataArray[i + 3];
+          break;
+        }
+      }
+
+      if (foundPrediction === null) {
+        document.getElementById("result").innerText = "कोई मिलती-जुलती पैटर्न नहीं मिली।";
+        return;
+      }
+
+      const predictedColor = numberToColor(foundPrediction);
+      document.getElementById("result").innerText = `भविष्यवाणी: ${predictedColor}`;
+    }
+  </script>
+</body>
+</html>
